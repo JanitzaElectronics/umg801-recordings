@@ -1,0 +1,81 @@
+// Copyright 2021 by Janitza electronics GmbH
+
+syntax = "proto3";
+
+package records;
+option optimize_for = LITE_RUNTIME;
+
+// One single Recording point of a recording
+message RecordedData {
+	// The start time in UTC seconds.
+	int64 startTimeUtc = 1;
+
+	// The recorded measurements.
+	RecordedDoubleTuple double=2;
+	RecordedFloatTuple float=3;
+	RecordedUint32Tuple uint32=4;
+	Recordedsint32Tuple sint32=5;
+	RecordedUint64Tuple uint64=6;
+	Recordedsint64Tuple sint64=7;
+	RecordedBoolTuple bool=8;
+}
+
+// objects for each tuple type of recorded data
+ 
+message RecordedDoubleTuple {
+	repeated double sample = 1;
+    repeated double avgValue = 2;
+    repeated double minValue = 3;
+    repeated int64 minTimestamp = 4;
+    repeated double maxValue = 5;
+    repeated int64 maxTimestamp = 6;
+}
+message RecordedFloatTuple {
+	repeated float sample = 1;
+    repeated float avgValue = 2;
+    repeated float minValue = 3;
+    repeated int64 minTimestamp = 4;
+    repeated float maxValue = 5;
+    repeated int64 maxTimestamp = 6;
+}
+message RecordedUint32Tuple {
+	repeated uint32 sample = 1;
+    repeated uint32 avgValue = 2;
+    repeated uint32 minValue = 3;
+    repeated int64 minTimestamp = 4;
+    repeated uint32 maxValue = 5;
+    repeated int64 maxTimestamp = 6;
+}
+message Recordedsint32Tuple {
+	repeated sint32 sample = 1;
+    repeated sint32 avgValue = 2;
+    repeated sint32 minValue = 3;
+    repeated int64 minTimestamp = 4;
+    repeated sint32 maxValue = 5;
+    repeated int64 maxTimestamp = 6;
+}
+message RecordedUint64Tuple {
+	repeated uint64 sample = 1;
+    repeated uint64 avgValue = 2;
+    repeated uint64 minValue = 3;
+    repeated int64 minTimestamp = 4;
+    repeated uint64 maxValue = 5;
+    repeated int64 maxTimestamp = 6;
+}
+message Recordedsint64Tuple {
+	repeated sint64 sample = 1;
+    repeated sint64 avgValue = 2;
+    repeated sint64 minValue = 3;
+    repeated int64 minTimestamp = 4;
+    repeated sint64 maxValue = 5;
+    repeated int64 maxTimestamp = 6;
+}
+message RecordedBoolTuple {
+	repeated bool sample = 1;
+    repeated bool avgValue = 2;
+    repeated bool minValue = 3;
+    repeated int64 minTimestamp = 4;
+    repeated bool maxValue = 5;
+    repeated int64 maxTimestamp = 6;
+}
+	

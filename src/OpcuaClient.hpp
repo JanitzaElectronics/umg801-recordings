@@ -62,7 +62,7 @@ private:
 
 template<typename T>
 	const T OpcuaClient::getVariantValue(const NodeId& nodeId) const {
-	T ret;
+	T ret = T();
 	UA_Variant *val = UA_Variant_new();
 	if(UA_Client_readValueAttribute(m_client, nodeId, val) == UA_STATUSCODE_GOOD) {
 		ret = *(T*)val->data;

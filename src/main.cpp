@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
 		 * This example just fetches all data, so we grab overall time range from device.
 		 */
 		if(r.getRange(startTime, stopTime) == UA_STATUSCODE_GOOD) {
-			auto count = r.countByRange(startTime,stopTime);
+			const auto count = r.countByRange(startTime,stopTime);
 			if(count > 0) {
 				std::cout << "Found Recording " << r.getId() << " with " << count << " Points between "
 						<< OpcUaUtil::dateTimeToString(startTime) << " and " << OpcUaUtil::dateTimeToString(stopTime) << std::endl;

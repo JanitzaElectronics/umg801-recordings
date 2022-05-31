@@ -22,7 +22,7 @@ std::list<Recording> Umg801::getRecordings() {
 			{{2,"Device", UA_NS0ID_ORGANIZES},
 			 {2,"Recordings", UA_NS0ID_HASCOMPONENT}});
 	if(recordingsNodeId.isNull()) {
-		std::cerr << "Node-ID of Node /Objects/Device/Recordins not found!" << std::endl;
+		std::cerr << "Node-ID of Node /Objects/Device/Recordings not found!" << std::endl;
 	} else {
 		for (const auto& n : getHierarichalNodes(recordingsNodeId)) {
 			if(OpcUaUtil::isPrefix(n.first, "Recording")) {
@@ -55,15 +55,16 @@ std::optional<std::string> Umg801::lookup(const NodeId& id, const UA_Tag& tag) {
 		}
 		UA_Variant input;
 		UA_Variant_init(&input);
-		UA_Variant_setScalarCopy(&input, &tag, &UA_TYPES[UA_TYPES_TAG]);
+		UA_Variant_setScalarCopy(&input, &tag, &UA_TYPES[UA_TYPES_INT32]);
 		size_t outputSize;
 		UA_Variant *output;
 		retval = clientCall(deviceId, lookupId, 1, &input, &outputSize, &output);
 		if(retval != UA_STATUSCODE_GOOD) {
 			std::cerr << "Method call to Lookup was unsuccessful: " << UA_StatusCode_name(retval) << std::endl;
 		} else {
-			UA_LookupInfo* info = (UA_LookupInfo*)output[0].data;
+			UA_ExtensionObject* e = (UA_ExtensionObject*) output[0].data;
 			for(size_t i=0; i < output[0].arrayLength; i++) {
+				UA_LookupInfo* info = (UA_LookupInfo*) e[i].content.decoded.data;
 				m_lookupInfo.emplace(NodeId(info->nodeId), OpcUaUtil::toString(info->browsePath));
 				info++;
 			}

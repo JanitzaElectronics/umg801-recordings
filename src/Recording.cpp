@@ -107,10 +107,10 @@ int Recording::countByRange(const UA_DateTime& startTime, const UA_DateTime& end
 
 UA_StatusCode Recording::readByStartAndCount(const UA_DateTime& startTime, const uint32_t& count) const {
 	UA_StatusCode retval = UA_STATUSCODE_GOOD;
-	int remian = count;
+	int remain = count;
 	UA_DateTime nextStartTime = startTime;
 	std::list<std::pair<uint32_t, records::RecordedData>> data;
-	while(remian > 0) {
+	while(remain > 0) {
 		UA_Variant input[2] = {0};
 		size_t outputSize;
 		UA_Variant *output;
@@ -126,13 +126,14 @@ UA_StatusCode Recording::readByStartAndCount(const UA_DateTime& startTime, const
 		} else {
 			if(nextStartTime >= *(UA_DateTime*)output[1].data) {
 				std::cerr << "Warning: Read LastDateTime is not bigger than start-time from last read! Stopping here!";
-				remian = 0;
+				remain = 0;
 			}
 			nextStartTime = *(UA_DateTime*)output[1].data;
 			const size_t recordingPoints = output[2].arrayDimensions[0];
-			UA_RecordingPoint* p = (UA_RecordingPoint*)output[2].data;
+			UA_ExtensionObject* e = (UA_ExtensionObject*)output[2].data;
 			for(size_t i=0; i<recordingPoints; i++) {
-				UA_ByteString* b = &(p[i].data);
+				UA_RecordingPoint* p = (UA_RecordingPoint*)e[i].content.decoded.data;
+				UA_ByteString* b = &(p->data);
 				/* The received Data is stored in a google protobuf structure.
 				 * Parse the received Byte-String as protobuf here!
 				 */
@@ -140,15 +141,15 @@ UA_StatusCode Recording::readByStartAndCount(const UA_DateTime& startTime, const
 				if(!protobuf.ParseFromArray(b->data, b->length)) {
 					std::cerr << "Failed to decode protobuffer of Recording-Point " << i << "(Recording" << m_id << ")" << std::endl;
 				} else {
-					data.emplace_back(p[i].configId, protobuf);
+					data.emplace_back(p->configId, protobuf);
 				}
 			}
 			UA_Array_delete(output, outputSize, &UA_TYPES[UA_TYPES_VARIANT]);
 			if(recordingPoints == 0) {
-				std::cerr << "Warning: no recording points returned while expecting " << remian << " more points! Stopping here!" << std::endl;
-				remian = 0;
+				std::cerr << "Warning: no recording points returned while expecting " << remain << " more points! Stopping here!" << std::endl;
+				remain = 0;
 			}
-			remian -= recordingPoints;
+			remain -= recordingPoints;
 		}
 	}
 

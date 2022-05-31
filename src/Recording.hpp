@@ -10,7 +10,6 @@
 
 #include "OpcuaClient.hpp"
 #include "records.pb.h"
-
 #include <list>
 #include <vector>
 #include <map>

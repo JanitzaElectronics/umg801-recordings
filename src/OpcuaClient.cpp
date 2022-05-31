@@ -6,6 +6,7 @@
  */
 
 #include "OpcuaClient.hpp"
+#include "CustomUaTypes.hpp"
 
 #include <iostream>
 #include <set>
@@ -14,6 +15,17 @@
 
 OpcuaClient::OpcuaClient() :
 	m_client(nullptr)
+	,m_customTypes({
+			UA_LookupInfoType,
+			UA_RecordingValueInfoType,
+			UA_RecordingTypeInfoType,
+			UA_RecordingValueType,
+			UA_ReferenceStatusType,
+			UA_RecordingDataTypeType,
+			UA_RecordingPointType,
+			UA_RecordingExtremalsType
+			})
+	,m_customDataTypes({nullptr, m_customTypes.size(), m_customTypes.data()})
 	,m_nodeIdCache()
 	{
 
@@ -32,6 +44,7 @@ bool OpcuaClient::connect(const std::string& url) {
 	m_client = UA_Client_new();
 	UA_ClientConfig *cc = UA_Client_getConfig(m_client);
 	UA_ClientConfig_setDefault(cc);
+	cc->customDataTypes = &m_customDataTypes;
 	cc->securityMode = securityMode;
 	cc->securityPolicyUri = securityPolicyUri;
 

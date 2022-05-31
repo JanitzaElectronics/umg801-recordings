@@ -8,7 +8,7 @@
 #ifndef OPCUAUTIL_HPP_
 #define OPCUAUTIL_HPP_
 
-#include <open62541/open62541.h>
+#include <open62541/client.h>
 #include <string>
 
 class OpcUaUtil {

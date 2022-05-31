@@ -9,11 +9,13 @@
 #define OPCUACLIENT_HPP_
 #include "NodeId.hpp"
 #include "OpcUaUtil.hpp"
+#include "CustomUaTypes.hpp"
 
 #include <string>
 #include <map>
 #include <vector>
-#include <open62541/open62541.h>
+#include <open62541/client_config_default.h>
+#include <open62541/client_highlevel.h>
 
 struct PathElement {
 	uint16_t ns;
@@ -57,6 +59,8 @@ public:
 
 private:
 	UA_Client* m_client;
+	std::vector<UA_DataType> m_customTypes;
+	UA_DataTypeArray m_customDataTypes;
 	std::map<std::vector<PathElement>,NodeId, CmpPathElement> m_nodeIdCache;
 };
 
@@ -65,6 +69,9 @@ template<typename T>
 	T ret = T();
 	UA_Variant *val = UA_Variant_new();
 	if(UA_Client_readValueAttribute(m_client, nodeId, val) == UA_STATUSCODE_GOOD) {
+		if(val->type->typeKind == UA_DATATYPEKIND_EXTENSIONOBJECT) {
+			std::cerr << "Unknown type!" << std::endl;
+		}
 		ret = *(T*)val->data;
 	}
 	UA_Variant_delete(val);
@@ -77,14 +84,20 @@ template<typename T>
 	UA_Variant *val = UA_Variant_new();
 	if(UA_Client_readValueAttribute(m_client, nodeId, val) == UA_STATUSCODE_GOOD) {
 		if(!UA_Variant_isScalar(val)) {
-			if(val->type->typeIndex == UA_TYPES_EXTENSIONOBJECT) {
+			if(val->type->typeKind == UA_DATATYPEKIND_EXTENSIONOBJECT) {
 				UA_ExtensionObject* e = (UA_ExtensionObject*)val->data;
 				for(size_t i=0; i < val->arrayLength; i++) {
-					ret.emplace_back(*(T*)e[i].content.decoded.data);
+					if(e[i].encoding < UA_EXTENSIONOBJECT_DECODED) {
+						std::cerr << "Unknown type!" << std::endl;
+					} else {
+						ret.emplace_back(*(T*)e[i].content.decoded.data);
+					}
 				}
 			} else {
 				ret.assign((T*)val->data, ((T*)val->data) + val->arrayLength);
 			}
+		} else {
+			std::cerr << "No array data!" << std::endl;
 		}
 	}
 	UA_Variant_delete(val);
